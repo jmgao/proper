@@ -161,7 +161,23 @@ pub fn derive_enum(
         })
         .collect::<Vec<_>>();
 
-    return quote! {
+    let tos = min_ty
+        .subtypes()
+        .iter()
+        .map(|ty| {
+            quote! {
+                impl From<#input_ident> for #ty {
+                    fn from(prim: #input_ident) -> #ty {
+                        prim as #ty
+                    }
+                }
+            }
+        })
+        .collect::<Vec<_>>();
+
+    quote! {
         #(#froms)*
-    };
+
+        #(#tos)*
+    }
 }
